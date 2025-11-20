@@ -1,167 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VotEarn</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f8f9fa;}
-    header {background:#ff4b5c; color:white; padding:10px; text-align:center;}
-    header img {height:50px; vertical-align:middle;}
-    h1,h2 {margin:10px 0; text-align:center;}
-    main {max-width:800px; margin:20px auto; padding:10px;}
-    .campaign-card {border:1px solid #ddd; padding:10px; margin:10px 0; border-radius:5px; display:flex; justify-content:space-between; align-items:center;}
-    .vote-btn {background:#ff4b5c; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;}
-    .vote-btn:hover {background:#ff2a3d;}
-    table {width:100%; border-collapse:collapse; margin-top:20px;}
-    th, td {padding:10px; border-bottom:1px solid #ddd; text-align:left;}
-    .ad-banner {text-align:center; margin:10px 0; padding:10px; background:#eee;}
-    form {background:#fff; padding:15px; border-radius:10px; box-shadow:0 0 10px #ccc; margin-bottom:20px;}
-    form input, form button {margin:5px 0; padding:8px; width:100%; box-sizing:border-box;}
-    form button {background:#ff4b5c; color:white; border:none; cursor:pointer;}
-    form button:hover {background:#ff2a3d;}
-  </style>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9905309315543268"
-     crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display with Ads</title>
+    <!-- Google AdSense Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9905309315543268"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .ad-container {
+            margin: 20px 0;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <img src="https://i.ibb.co/4wsW2HSj/IMG-20251120-WA0090.jpg" alt="VotEarn Logo">
-    <h1>VotEarn</h1>
-  </header>
 
-  <main>
-    <!-- Admin Campaign Creation Form -->
-    <section>
-      <h2>Create Campaign (Admin)</h2>
-      <form id="campaign-form">
-        <input type="text" id="campaign-title" placeholder="Campaign Title" required>
-        <input type="date" id="campaign-end" required>
-        <input type="text" id="participants" placeholder="Participants (comma separated IDs)" required>
-        <input type="number" id="max-winners" placeholder="Max Winners" required>
-        <input type="text" id="prizes" placeholder="Prizes" required>
-        <button type="submit">Create Campaign</button>
-      </form>
-    </section>
+    <!-- Top Banner Ad -->
+    <div class="ad-container">
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-9905309315543268"
+            data-ad-slot="9317688991"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
 
-    <!-- Ongoing Campaigns -->
-    <section id="campaigns">
-      <h2>Ongoing Campaigns</h2>
-      <div id="campaign-list"></div>
-    </section>
+    <!-- Image -->
+    <img src="https://i.ibb.co/4wsW2HSj/IMG-20251120-WA0090.jpg" alt="Displayed Image">
 
-    <!-- Leaderboard -->
-    <section id="leaderboard">
-      <h2>Top Fans</h2>
-      <table>
-        <thead>
-          <tr><th>Fan</th><th>Total Votes</th></tr>
-        </thead>
-        <tbody id="leaderboard-list"></tbody>
-      </table>
-    </section>
+    <!-- Bottom Banner Ad -->
+    <div class="ad-container">
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-9905309315543268"
+            data-ad-slot="9317688991"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
 
-    <!-- Banner Ad -->
-    <section class="ad-banner">
-      <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-9905309315543268"
-         data-ad-slot="2702322596"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </section>
-  </main>
-
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCCQ2TxyLl67OMQZ5eDOs2BI6p94AZ-kVo",
-      authDomain: "votearn-4198c.firebaseapp.com",
-      projectId: "votearn-4198c",
-      storageBucket: "votearn-4198c.appspot.com",
-      messagingSenderId: "228667550636",
-      appId: "1:228667550636:web:9e1b5d091ac7e058306809"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    const campaignList = document.getElementById("campaign-list");
-    const leaderboardList = document.getElementById("leaderboard-list");
-
-    // Load campaigns
-    db.collection("campaigns").onSnapshot(snapshot => {
-      campaignList.innerHTML = "";
-      snapshot.forEach(doc => {
-        const c = doc.data();
-        const card = document.createElement("div");
-        card.classList.add("campaign-card");
-        card.innerHTML = `
-          <div>
-            <h3>${c.title}</h3>
-            <p>Ends: ${new Date(c.endDate.seconds*1000).toLocaleDateString()}</p>
-            <p>Participants: ${c.participants.join(", ")}</p>
-          </div>
-          <button class="vote-btn" onclick="vote('${doc.id}')">❤️ Vote</button>
-        `;
-        campaignList.appendChild(card);
-      });
-    });
-
-    // Vote function
-    function vote(campaignId){
-      const fanId = prompt("Enter your Fan ID");
-      if(!fanId) return;
-      const participantId = prompt("Enter Participant ID to vote for");
-      if(!participantId) return;
-
-      const voteRef = db.collection("votes").doc(`${campaignId}_${fanId}_${participantId}`);
-      voteRef.get().then(doc=>{
-        if(doc.exists){
-          voteRef.update({voteCount: firebase.firestore.FieldValue.increment(1)});
-        } else {
-          voteRef.set({campaignId, fanId, participantId, voteCount:1});
-        }
-      });
-    }
-
-    // Leaderboard
-    db.collection("votes").onSnapshot(snapshot=>{
-      const leaderboard = {};
-      snapshot.forEach(doc=>{
-        const v = doc.data();
-        if(!leaderboard[v.fanId]) leaderboard[v.fanId]=0;
-        leaderboard[v.fanId]+=v.voteCount;
-      });
-      leaderboardList.innerHTML = "";
-      Object.entries(leaderboard).sort((a,b)=>b[1]-a[1]).forEach(([fan,votes])=>{
-        const row = document.createElement("tr");
-        row.innerHTML=`<td>${fan}</td><td>${votes}</td>`;
-        leaderboardList.appendChild(row);
-      });
-    });
-
-    // Admin form submission
-    const form = document.getElementById("campaign-form");
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const title = document.getElementById("campaign-title").value;
-      const endDate = new Date(document.getElementById("campaign-end").value);
-      const participants = document.getElementById("participants").value.split(",").map(p=>p.trim());
-      const maxWinners = parseInt(document.getElementById("max-winners").value);
-      const prizes = document.getElementById("prizes").value;
-
-      db.collection("campaigns").add({title,endDate,participants,maxWinners,prizes})
-        .then(()=>{ alert("Campaign created!"); form.reset(); })
-        .catch(err=>console.error(err));
-    });
-  </script>
 </body>
 </html>
