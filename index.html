@@ -3,62 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image with Ads</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9905309315543268"
-        crossorigin="anonymous"></script>
+    <title>The Ultimate Football GOAT Awards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f9f9f9;
-            font-family: Arial, sans-serif;
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
-        img {
-            max-width: 90%;
-            height: auto;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-        }
-        .ad-container {
-            margin: 15px 0;
-            width: 100%;
-            text-align: center;
+        .active-tab {
+            background-color: rgb(15, 23, 42) !important;
+            border-color: rgba(245, 158, 11, 0.4) !important;
+            color: rgb(245, 158, 11) !important;
         }
     </style>
 </head>
-<body>
+<body class="bg-[#030712] text-slate-100 font-sans min-h-screen pb-12 selection:bg-amber-500/20 selection:text-amber-400">
 
-    <!-- Top Ad Placeholder -->
-    <div class="ad-container">
-        <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-9905309315543268"
-            data-ad-slot="9317688991"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
+    <header class="border-b border-slate-900 bg-slate-950/40 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i data-lucide="crown" class="w-5 h-5 text-amber-500 animate-pulse"></i>
+                <h1 class="text-xs font-black tracking-widest uppercase text-slate-200">Syrix Awards 2026</h1>
+            </div>
+            <div id="category-closing-timer" class="text-[10px] font-mono text-amber-400/90 bg-amber-950/30 px-2.5 py-1 rounded-xl border border-amber-500/10">
+                Loading clock...
+            </div>
+        </div>
+    </header>
 
-    <!-- Centered Image -->
-    <img src="https://i.ibb.co/4wsW2HSj/IMG-20251120-WA0090.jpg" alt="Displayed Image">
+    <section class="max-w-4xl mx-auto px-4 mt-6 text-center">
+        <h2 id="current-category-title" class="text-xl font-black tracking-tight text-slate-100 sm:text-2xl">Ultimate GOAT</h2>
+        <p id="current-category-type" class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1 font-mono">Direct Finals</p>
+    </section>
 
-    <!-- Bottom Ad Placeholder -->
-    <div class="ad-container">
-        <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-9905309315543268"
-            data-ad-slot="9317688991"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
+    <nav class="flex gap-2 overflow-x-auto px-4 mt-5 max-w-4xl mx-auto no-scrollbar scroll-smooth">
+        <button onclick="switchCategory('ultimate')" id="tab-ultimate" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap active-tab">
+            <i data-lucide="crown" class="w-3.5 h-3.5"></i> Ultimate GOAT
+        </button>
+        <button onclick="switchCategory('pots')" id="tab-pots" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> POTS (Finals)
+        </button>
+        <button onclick="switchCategory('new_era')" id="tab-new_era" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> New Era
+        </button>
+        <button onclick="switchCategory('attackers')" id="tab-attackers" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap">
+            <i data-lucide="swords" class="w-3.5 h-3.5"></i> Attackers
+        </button>
+        <button onclick="switchCategory('midfield')" id="tab-midfield" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap">
+            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Midfield
+        </button>
+        <button onclick="switchCategory('defense')" id="tab-defense" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap">
+            <i data-lucide="shield" class="w-3.5 h-3.5"></i> Defense
+        </button>
+        <button onclick="switchCategory('goalkeeper')" id="tab-goalkeeper" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap">
+            <i data-lucide="hand" class="w-3.5 h-3.5"></i> Goalkeeper
+        </button>
+        <button onclick="switchCategory('coach')" id="tab-coach" class="tab-btn flex items-center gap-1.5 px-4 py-2 text-xs rounded-xl border border-slate-800 bg-slate-900/20 cursor-pointer whitespace-nowrap">
+            <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Coach
+        </button>
+    </nav>
 
+    <main class="max-w-4xl mx-auto px-4 mt-6">
+        <div id="player-leaderboard-grid" class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            </div>
+
+        <section class="mt-8">
+            <div class="flex items-center gap-2 mb-3 px-1">
+                <i data-lucide="message-square" class="w-4 h-4 text-amber-500"></i>
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Live Fan Lounge</h3>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping ml-1"></span>
+            </div>
+
+            <div class="glass-card border border-slate-900 rounded-2xl p-4 flex flex-col h-[380px] justify-between">
+                <div id="chat-messages-feed" class="flex-1 overflow-y-auto pr-1 space-y-3 mb-4 text-xs no-scrollbar">
+                    <p class="text-slate-500 italic text-center text-[11px]">Connecting to live fan lounge chat stream...</p>
+                </div>
+
+                <form id="chat-input-form" onsubmit="handleChatSubmit(event)" class="flex gap-2 pt-2 border-t border-slate-900">
+                    <input type="text" id="chat-username" placeholder="Name" maxlength="12" required 
+                           class="w-20 bg-slate-950 border border-slate-850 focus:border-amber-500/40 rounded-xl px-3 py-2 text-xs font-medium text-slate-300 outline-none">
+                    <input type="text" id="chat-msg" placeholder="Type message..." maxlength="100" required autocomplete="off"
+                           class="flex-1 bg-slate-950 border border-slate-850 focus:border-amber-500/40 rounded-xl px-3 py-2 text-xs font-medium text-slate-300 outline-none">
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-3.5 py-2 rounded-xl transition-all font-bold flex items-center justify-center cursor-pointer">
+                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, runTransaction, push, serverTimestamp, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT9v-MfKjPpBHT58Iwt8JznDvwRjPIhqs",
+            authDomain: "goat-awards.firebaseapp.com",
+            databaseURL: "https://goat-awards-default-rtdb.firebaseio.com",
+            projectId: "goat-awards",
+            storageBucket: "goat-awards.firebasestorage.app",
+            messagingSenderId: "210046042590",
+            appId: "1:210046042590:web:b9473b14f8834fe0521d4f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const adsterraSmartLinks = {
+            ultimate: "https://www.highrevenuegate.com/ultimate_goats_link",
+            pots: "https://www.highrevenuegate.com/pots_link",
+            new_era: "https://www.highrevenuegate.com/new_era_link",
+            attackers: "https://www.highrevenuegate.com/attackers_link",
+            midfield: "https://www.highrevenuegate.com/midfield_link",
+            defense: "https://www.highrevenuegate.com/defense_link",
+            goalkeeper: "https://www.highrevenuegate.com/goalkeeper_link",
+            coach: "https://www.highrevenuegate.com/coach_link"
+        };
+
+        let currentCategory = 'ultimate';
+        let countdownTickerInterval = null;
+        let currentDbRef = null;
+
+        // --- SECTION 1: LEADERBOARD SYSTEM ---
+        function bindCategoryRealtimeStream(categoryKey) {
+            currentCategory = categoryKey;
+            currentDbRef = ref(db, 'categories/' + categoryKey);
+
+            onValue(currentDbRef, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                document.getElementById("current-category-title").innerText = data.title;
+                document.getElementById("current-category-type").innerText = data.type;
+
+                renderLeaderboard(data.players);
+                initCategoryCountdown(data.endTime);
+            });
+        }
+
+        function renderLeaderboard(playersObjectOrArray) {
+            const grid = document.getElementById("player-leaderboard-grid");
+            grid.innerHTML = "";
+
+            const playersList = Array.isArray(playersObjectOrArray) 
+                ? playersObjectOrArray.filter(p => p !== null) 
+                : Object.values(playersObjectOrArray);
+
+            const sortedPlayers = [...playersList].sort((a, b) => b.votes - a.votes);
+
+            sortedPlayers.forEach((player, index) => {
+                if (index === 4) {
+                    grid.innerHTML += `
+                        <div class="col-span-2 glass-card rounded-2xl p-4 flex flex-col items-center justify-center border border-dashed border-slate-800 bg-slate-950/20 min-h-[140px]">
+                            <span class="text-[9px] text-slate-500 tracking-widest uppercase mb-1 font-bold">Trending Debate</span>
+                            <div class="w-full h-full bg-slate-900/20 rounded-xl flex items-center justify-center text-xs text-slate-600 text-center px-4">
+                                [ Adsterra Banner Code Position ]
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const isLeader = index === 0;
+
+                const cardHTML = `
+                    <div class="glass-card rounded-2xl p-4 flex flex-col items-center text-center relative overflow-hidden transition-all duration-300 ${isLeader ? 'border-amber-500/20 bg-amber-500/[0.005]' : 'hover:border-slate-800'}">
+                        ${isLeader ? 
+                            '<span class="absolute top-3 left-3 text-[9px] font-black text-amber-400 bg-amber-950/50 px-1.5 py-0.5 rounded border border-amber-500/20 tracking-wider">LEADER</span>' : 
+                            `<span class="absolute top-3 left-3 text-[10px] font-mono font-bold text-slate-600">#${index + 1}</span>`
+                        }
+                        <div class="w-11 h-11 rounded-full bg-slate-900 border ${isLeader ? 'border-amber-500/30' : 'border-slate-800/80'} flex items-center justify-center mb-2.5 text-xs font-bold text-slate-400">
+                            ${player.name.charAt(0)}
+                        </div>
+                        <h3 class="font-bold text-xs text-slate-300 tracking-wide truncate max-w-full">${player.name}</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5 font-mono">${player.votes.toLocaleString()} pts</p>
+                        
+                        <button onclick="executeDatabaseVote('${player.id}')" 
+                                id="btn-${player.id}"
+                                class="vote-btn w-full mt-3.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 text-[11px] font-bold py-2 px-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1">
+                            <i data-lucide="check-square" class="w-3 h-3 text-amber-400"></i> VOTE
+                        </button>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            });
+
+            lucide.createIcons();
+            checkAndApplyCooldown();
+        }
+
+        window.executeDatabaseVote = async function(playerId) {
+            const lastVote = localStorage.getItem(`cooldown_${currentCategory}`);
+            const now = new Date().getTime();
+            
+            if (lastVote && now < parseInt(lastVote)) return;
+
+            window.open(adsterraSmartLinks[currentCategory] || adsterraSmartLinks['ultimate'], '_blank');
+
+            const targetPlayersRef = ref(db, `categories/${currentCategory}/players`);
+
+            try {
+                await runTransaction(targetPlayersRef, (playersData) => {
+                    if (playersData) {
+                        const keys = Object.keys(playersData);
+                        for (let key of keys) {
+                            if (playersData[key] && playersData[key].id === playerId) {
+                                if (playersData[key].actualVotes === undefined) playersData[key].actualVotes = playersData[key].votes || 0;
+                                if (playersData[key].riggedVotes === undefined) playersData[key].riggedVotes = 0;
+
+                                playersData[key].actualVotes += 1;
+                                playersData[key].votes = playersData[key].actualVotes + playersData[key].riggedVotes;
+                                break;
+                            }
+                        }
+                    }
+                    return playersData;
+                });
+
+                const lockoutTime = now + (60 * 60 * 1000);
+                localStorage.setItem(`cooldown_${currentCategory}`, lockoutTime.toString());
+                checkAndApplyCooldown();
+
+            } catch (error) {
+                console.error("Vote handling error:", error);
+            }
+        };
+
+        function initCategoryCountdown(endTimeString) {
+            if (countdownTickerInterval) clearInterval(countdownTickerInterval);
+            const targetTime = new Date(endTimeString).getTime();
+
+            function updateTicker() {
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    document.getElementById("category-closing-timer").innerText = "Voting Closed";
+                    clearInterval(countdownTickerInterval);
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                document.getElementById("category-closing-timer").innerText = `${days}d ${hours}h ${mins}m left`;
+            }
+            updateTicker();
+            countdownTickerInterval = setInterval(updateTicker, 60000);
+        }
+
+        function checkAndApplyCooldown() {
+            const lastVote = localStorage.getItem(`cooldown_${currentCategory}`);
+            if (!lastVote) return;
+
+            const now = new Date().getTime();
+            const timeLeft = parseInt(lastVote) - now;
+
+            if (timeLeft <= 0) {
+                localStorage.removeItem(`cooldown_${currentCategory}`);
+                return;
+            }
+
+            const buttons = document.querySelectorAll('.vote-btn');
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.className = "vote-btn w-full mt-3.5 bg-slate-950/40 text-slate-600 border border-slate-900/60 text-[10px] py-2 px-3 rounded-xl cursor-not-allowed flex items-center justify-center gap-1 font-mono";
+                btn.innerHTML = `<i data-lucide="lock" class="w-3 h-3 text-slate-600"></i> ${minutes}m ${seconds}s`;
+            });
+            lucide.createIcons();
+            
+            setTimeout(checkAndApplyCooldown, 1000);
+        }
+
+        window.switchCategory = function(categoryKey) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+            document.getElementById(`tab-${categoryKey}`).classList.add('active-tab');
+            bindCategoryRealtimeStream(categoryKey);
+        };
+
+
+        // --- SECTION 2: LIVE CHAT ROOM LOGIC ---
+        const chatFeed = document.getElementById("chat-messages-feed");
+        const chatForm = document.getElementById("chat-input-form");
+
+        // Cache saved username to local storage for quick messaging
+        if(localStorage.getItem("chat_username")) {
+            document.getElementById("chat-username").value = localStorage.getItem("chat_username");
+        }
+
+        // Query only the last 40 chat messages to prevent performance lag on mobile phones
+        const chatQuery = query(ref(db, 'messages'), limitToLast(40));
+
+        onValue(chatQuery, (snapshot) => {
+            chatFeed.innerHTML = "";
+            const data = snapshot.val();
+            if (!data) {
+                chatFeed.innerHTML = `<p class="text-slate-600 italic text-center text-[11px] mt-4">No chatter yet. Start the debate!</p>`;
+                return;
+            }
+
+            // Loop through messages naturally
+            Object.values(data).forEach(msg => {
+                const msgBox = document.createElement("div");
+                msgBox.className = "bg-slate-950/40 border border-slate-900/60 rounded-xl p-2.5 max-w-[90%] w-fit animate-fade-in";
+                msgBox.innerHTML = `
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <span class="font-black text-amber-500/90 text-[10px] tracking-wide">${escapeHtml(msg.username)}</span>
+                    </div>
+                    <p class="text-slate-300 tracking-wide text-[11px] leading-relaxed break-all">${escapeHtml(msg.text)}</p>
+                `;
+                chatFeed.appendChild(msgBox);
+            });
+
+            // Auto-scroll layout smoothly straight to the newest text entry frame
+            chatFeed.scrollTop = chatFeed.scrollHeight;
+        });
+
+        window.handleChatSubmit = async function(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById("chat-username").value.trim();
+            const messageInput = document.getElementById("chat-msg").value.trim();
+
+            if(!usernameInput || !messageInput) return;
+
+            // Cache username handle
+            localStorage.setItem("chat_username", usernameInput);
+
+            try {
+                // Post object properties seamlessly to database tree node pointer
+                await push(ref(db, 'messages'), {
+                    username: usernameInput,
+                    text: messageInput,
+                    timestamp: serverTimestamp()
+                });
+                document.getElementById("chat-msg").value = "";
+            } catch (err) {
+                console.error("Chat message write failure:", err);
+            }
+        };
+
+        // Anti-XSS String Sanitizer security tool
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Boot init
+        bindCategoryRealtimeStream('ultimate');
+    </script>
 </body>
 </html>
