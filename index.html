@@ -353,23 +353,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 // Rewriting your Facebook function to handle App Installation
-async function shareViaFacebook() {
-    if (deferredPrompt) {
-        // Trigger the native Android/Chrome install dialog
-        deferredPrompt.prompt();
-        
-        // Wait for the user to click 'Install' or 'Cancel'
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`Installation choice: ${outcome}`);
-        
-        // Clear the prompt variable since it can only be used once
-        deferredPrompt = null;
-    } else {
-        // Fallback: If the app is already installed or the browser doesn't support it
-        alert("To install, tap your browser's menu (three dots) or Share button and select 'Add to Home Screen'!");
-    }
-}
-
+Function shareViaFacebook() {
+            const url = encodeURIComponent(SHARE_URL);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(SHARE_TEXT)}`, "_blank");
+        }
 
         function copyShareLink() {
             const fullText = `${SHARE_TEXT}\n${SHARE_URL}`;
