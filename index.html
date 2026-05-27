@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Ultimate Football GOAT Awards</title>
+    <button id="pwaInstallBtn" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-4 rounded-lg text-sm transition dynamics shadow-lg flex items-center gap-2">
+    <i class="lucide-download text-base"></i> Install Syrix App
+    </button>
+    
         <meta name="theme-color" content="#030712">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -645,6 +649,43 @@
                     .catch(err => console.error('PWA Service Worker registration failed:', err));
             });
         }
+
+            let deferredPrompt;
+const installBtn = document.getElementById('pwaInstallBtn');
+
+// Listen for the browser's hidden install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent default browser behavior so we can use our custom button
+    e.preventDefault();
+    deferredPrompt = e;
+    // Reveal the install button to the user
+    installBtn.classList.remove('hidden');
+});
+
+// Handle the button click
+installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    
+    // Show the official native installation banner
+    deferredPrompt.prompt();
+    
+    // Wait for the user to accept or decline
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to install: ${outcome}`);
+    
+    // Clear the prompt variable; it can only be used once
+    deferredPrompt = null;
+    // Hide our custom button again
+    installBtn.classList.add('hidden');
+});
+
+// Hide button if already installed successfully
+window.addEventListener('appinstalled', () => {
+    installBtn.classList.add('hidden');
+    deferredPrompt = null;
+    console.log('Syrix Awards installed successfully!');
+});
+            
     </script>
     
 </body>
