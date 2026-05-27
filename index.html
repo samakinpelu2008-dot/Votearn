@@ -388,7 +388,7 @@
     </script>
 
     <!-- ══════════════════════ FIREBASE ══════════════════════ -->
-    <script type="module">
+     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, runTransaction, push, serverTimestamp, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -434,7 +434,7 @@
         window.executeDatabaseVote = async function(playerId) {
             const lastVote = localStorage.getItem(`cooldown_${currentCategory}`);
             const now = new Date().getTime();
-            
+
             if (lastVote && now < parseInt(lastVote)) return;
 
             const targetAdUrl = adsterraSmartLinks[currentCategory] || adsterraSmartLinks['ultimate'];
@@ -517,15 +517,40 @@
             const sortedPlayers = [...playersList].sort((a, b) => b.votes - a.votes);
 
             sortedPlayers.forEach((player, index) => {
+                // FIXED BANNER AD INJECTION POSITION
                 if (index === 4) {
                     grid.innerHTML += `
-                        <div class="col-span-2 glass-card rounded-2xl p-4 flex flex-col items-center justify-center border border-dashed border-slate-800 bg-slate-950/20 min-h-[140px]">
-                            <span class="text-[9px] text-slate-500 tracking-widest uppercase mb-1 font-bold">Trending Debate</span>
-                            <div class="w-full h-full bg-slate-900/20 rounded-xl flex items-center justify-center text-xs text-slate-600 text-center px-4">
-                                [ Adsterra Banner Code Position ]
+                        <div class="col-span-2 glass-card rounded-2xl p-4 flex flex-col items-center justify-center border border-dashed border-slate-800 bg-slate-950/20 min-h-[285px]">
+                            <span class="text-[9px] text-slate-500 tracking-widest uppercase mb-2 font-bold">Trending Debate</span>
+                            <div class="w-[300px] h-[250px] bg-slate-900/10 rounded-xl flex items-center justify-center overflow-hidden">
+                                <iframe src="about:blank" id="adsterra-banner-frame" width="300" height="250" frameborder="0" scrolling="no"></iframe>
                             </div>
                         </div>
                     `;
+
+                    // Push the scripts into the blank iframe context securely
+                    setTimeout(() => {
+                        const frame = document.getElementById('adsterra-banner-frame');
+                        if (frame && frame.contentWindow) {
+                            const doc = frame.contentWindow.document;
+                            doc.open();
+                            doc.write(`
+                                <body style="margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;">
+                                    <script type="text/javascript">
+                                        atOptions = {
+                                            'key' : '085de3c9f092f1b983d0a174b2b2388d',
+                                            'format' : 'iframe',
+                                            'height' : 250,
+                                            'width' : 300,
+                                            'params' : {}
+                                        };
+                                    <\/script>
+                                    <script type="text/javascript" src="https://www.highperformanceformat.com/085de3c9f092f1b983d0a174b2b2388d/invoke.js"><\/script>
+                                </body>
+                            `);
+                            doc.close();
+                        }
+                    }, 50);
                 }
 
                 const isLeader = index === 0;
@@ -637,6 +662,7 @@
         bindCategoryRealtimeStream('ultimate');
         setInterval(checkAndApplyCooldown, 1000);
     </script>
+
         <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
