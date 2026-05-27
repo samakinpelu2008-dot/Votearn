@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Ultimate Football GOAT Awards</title>
+        <meta name="theme-color" content="#030712">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Syrix Awards">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/images/icon-192.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -20,18 +27,211 @@
             border-color: rgba(245, 158, 11, 0.4) !important;
             color: rgb(245, 158, 11) !important;
         }
+
+        /* ── Share Overlay ── */
+        #share-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(3, 7, 18, 0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            align-items: flex-end;
+            justify-content: center;
+        }
+        #share-overlay.open {
+            display: flex;
+            animation: overlayFadeIn 0.22s ease forwards;
+        }
+        @keyframes overlayFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        #share-panel {
+            width: 100%;
+            max-width: 480px;
+            background: #0b1120;
+            border: 1px solid rgba(245,158,11,0.12);
+            border-bottom: none;
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 36px;
+            animation: panelSlideUp 0.28s cubic-bezier(0.34,1.28,0.64,1) forwards;
+        }
+        @keyframes panelSlideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+        .share-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            text-align: left;
+        }
+        .share-option:hover, .share-option:active {
+            background: rgba(245,158,11,0.07);
+            border-color: rgba(245,158,11,0.2);
+        }
+        .share-option .icon-wrap {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+        .share-option .label { font-size: 13px; font-weight: 700; color: #cbd5e1; letter-spacing: 0.01em; }
+        .share-option .sublabel { font-size: 10px; color: #475569; margin-top: 1px; font-family: monospace; }
+
+        #copy-toast {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            border: 1px solid rgba(245,158,11,0.25);
+            color: #f59e0b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            padding: 8px 18px;
+            border-radius: 999px;
+            z-index: 300;
+            white-space: nowrap;
+        }
+        #copy-toast.show {
+            display: block;
+            animation: toastPop 0.2s ease;
+        }
+        @keyframes toastPop {
+            from { opacity:0; transform: translateX(-50%) scale(0.9); }
+            to   { opacity:1; transform: translateX(-50%) scale(1); }
+        }
     </style>
 </head>
 <body class="bg-[#030712] text-slate-100 font-sans min-h-screen pb-12 selection:bg-amber-500/20 selection:text-amber-400">
 
+    <!-- ══════════════════════ SHARE OVERLAY ══════════════════════ -->
+    <div id="share-overlay" onclick="closeShareOverlay(event)">
+        <div id="share-panel">
+            <!-- Handle bar -->
+            <div class="w-10 h-1 rounded-full bg-slate-700 mx-auto mb-5"></div>
+
+            <!-- Title -->
+            <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="share-2" class="w-4 h-4 text-amber-500"></i>
+                <span class="text-xs font-black uppercase tracking-widest text-slate-300">Share & Invite</span>
+            </div>
+            <p class="text-[10px] text-slate-600 font-mono mb-4 pl-6">Let your friends vote &amp; join the debate</p>
+
+            <!-- Share preview card -->
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
+                <i data-lucide="crown" class="w-5 h-5 text-amber-500 flex-shrink-0"></i>
+                <div class="min-w-0">
+                    <p class="text-[11px] font-bold text-slate-200 truncate">Syrix GOAT Awards 2026</p>
+                    <p class="text-[9px] text-slate-500 font-mono truncate" id="share-preview-url">syrixawards.com</p>
+                </div>
+            </div>
+
+            <!-- Share options -->
+            <div class="flex flex-col gap-2.5">
+
+                <button class="share-option" onclick="shareViaWhatsApp()">
+                    <div class="icon-wrap" style="background:#12291f">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </div>
+                    <div>
+                        <div class="label">WhatsApp</div>
+                        <div class="sublabel">Send to contacts &amp; groups</div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700 ml-auto"></i>
+                </button>
+
+                <button class="share-option" onclick="shareViaTwitter()">
+                    <div class="icon-wrap" style="background:#0e1e2e">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#1DA1F2"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </div>
+                    <div>
+                        <div class="label">Post on X (Twitter)</div>
+                        <div class="sublabel">Share your pick with followers</div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700 ml-auto"></i>
+                </button>
+
+                <button class="share-option" onclick="shareViaTelegram()">
+                    <div class="icon-wrap" style="background:#0e1e2a">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#26A5E4"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    </div>
+                    <div>
+                        <div class="label">Telegram</div>
+                        <div class="sublabel">Drop it in your chat or channel</div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700 ml-auto"></i>
+                </button>
+
+                <button class="share-option" onclick="shareViaFacebook()">
+                    <div class="icon-wrap" style="background:#0e1a2e">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </div>
+                    <div>
+                        <div class="label">Facebook</div>
+                        <div class="sublabel">Share to your timeline or story</div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700 ml-auto"></i>
+                </button>
+
+                <button class="share-option" onclick="copyShareLink()">
+                    <div class="icon-wrap bg-slate-900" id="copy-icon-wrap">
+                        <i data-lucide="link-2" class="w-4.5 h-4.5 text-amber-400" id="copy-icon"></i>
+                    </div>
+                    <div>
+                        <div class="label" id="copy-label">Copy Link</div>
+                        <div class="sublabel">Paste anywhere you want</div>
+                    </div>
+                </button>
+
+                <!-- Native share (mobile) if available -->
+                <button class="share-option" id="native-share-btn" onclick="nativeShare()" style="display:none">
+                    <div class="icon-wrap bg-slate-900">
+                        <i data-lucide="share" class="w-4.5 h-4.5 text-slate-300"></i>
+                    </div>
+                    <div>
+                        <div class="label">More Options…</div>
+                        <div class="sublabel">AirDrop, Notes, and more</div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-700 ml-auto"></i>
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy toast -->
+    <div id="copy-toast">✓ LINK COPIED</div>
+
+    <!-- ══════════════════════ HEADER ══════════════════════ -->
     <header class="border-b border-slate-900 bg-slate-950/40 sticky top-0 z-50 backdrop-blur-md">
         <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <i data-lucide="crown" class="w-5 h-5 text-amber-500 animate-pulse"></i>
                 <h1 class="text-xs font-black tracking-widest uppercase text-slate-200">Syrix Awards 2026</h1>
             </div>
-            <div id="category-closing-timer" class="text-[10px] font-mono text-amber-400/90 bg-amber-950/30 px-2.5 py-1 rounded-xl border border-amber-500/10">
-                Loading clock...
+            <div class="flex items-center gap-2">
+                <button onclick="openShareOverlay()" 
+                        class="flex items-center gap-1.5 text-[10px] font-bold tracking-wide text-slate-400 hover:text-amber-400 bg-slate-900/60 hover:bg-amber-950/30 border border-slate-800 hover:border-amber-500/20 px-2.5 py-1.5 rounded-xl transition-all cursor-pointer">
+                    <i data-lucide="share-2" class="w-3 h-3"></i>
+                    <span class="hidden sm:inline">Share</span>
+                </button>
+                <div id="category-closing-timer" class="text-[10px] font-mono text-amber-400/90 bg-amber-950/30 px-2.5 py-1 rounded-xl border border-amber-500/10">
+                    Loading clock...
+                </div>
             </div>
         </div>
     </header>
@@ -69,8 +269,7 @@
     </nav>
 
     <main class="max-w-4xl mx-auto px-4 mt-6">
-        <div id="player-leaderboard-grid" class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            </div>
+        <div id="player-leaderboard-grid" class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"></div>
 
         <section class="mt-8">
             <div class="flex items-center gap-2 mb-3 px-1">
@@ -97,6 +296,98 @@
         </section>
     </main>
 
+    <!-- ══════════════════════ SHARE LOGIC ══════════════════════ -->
+    <script>
+        const SHARE_URL  = window.location.href;
+        const SHARE_TEXT = "🏆 Who's the real GOAT? Vote now in the Syrix GOAT Awards 2026 — the ultimate football debate is live! Cast your vote before voting closes 👇";
+        const SHARE_HASHTAGS = "GOATAwards,Football,Syrix2026";
+
+        function openShareOverlay() {
+            document.getElementById("share-preview-url").textContent = SHARE_URL.length > 45 ? SHARE_URL.slice(0,45)+"…" : SHARE_URL;
+            document.getElementById("share-overlay").classList.add("open");
+            document.body.style.overflow = "hidden";
+            // show native share if supported
+            if (navigator.share) {
+                document.getElementById("native-share-btn").style.display = "flex";
+            }
+            lucide.createIcons();
+        }
+
+        function closeShareOverlay(e) {
+            if (e && e.target !== document.getElementById("share-overlay")) return;
+            document.getElementById("share-overlay").classList.remove("open");
+            document.body.style.overflow = "";
+        }
+
+        window.closeShareOverlay = closeShareOverlay;
+        window.openShareOverlay  = openShareOverlay;
+
+        // Close on Escape
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeShareOverlay({ target: document.getElementById("share-overlay") });
+        });
+
+        function shareViaWhatsApp() {
+            const msg = encodeURIComponent(`${SHARE_TEXT}\n${SHARE_URL}`);
+            window.open(`https://wa.me/?text=${msg}`, "_blank");
+        }
+
+        function shareViaTwitter() {
+            const text = encodeURIComponent(SHARE_TEXT);
+            const url  = encodeURIComponent(SHARE_URL);
+            const tags = encodeURIComponent(SHARE_HASHTAGS);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}&hashtags=${tags}`, "_blank");
+        }
+
+        function shareViaTelegram() {
+            const text = encodeURIComponent(`${SHARE_TEXT}\n${SHARE_URL}`);
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(SHARE_URL)}&text=${encodeURIComponent(SHARE_TEXT)}`, "_blank");
+        }
+
+        function shareViaFacebook() {
+            const url = encodeURIComponent(SHARE_URL);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(SHARE_TEXT)}`, "_blank");
+        }
+
+        function copyShareLink() {
+            const fullText = `${SHARE_TEXT}\n${SHARE_URL}`;
+            navigator.clipboard.writeText(fullText).then(() => {
+                // Visual feedback on button
+                const label = document.getElementById("copy-label");
+                label.textContent = "Copied!";
+                label.style.color = "#f59e0b";
+                setTimeout(() => { label.textContent = "Copy Link"; label.style.color = ""; }, 2000);
+
+                // Toast
+                const toast = document.getElementById("copy-toast");
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 2200);
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement("textarea");
+                ta.value = fullText;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+            });
+        }
+
+        async function nativeShare() {
+            try {
+                await navigator.share({ title: "Syrix GOAT Awards 2026", text: SHARE_TEXT, url: SHARE_URL });
+            } catch(e) { /* user cancelled */ }
+        }
+
+        window.shareViaWhatsApp  = shareViaWhatsApp;
+        window.shareViaTwitter   = shareViaTwitter;
+        window.shareViaTelegram  = shareViaTelegram;
+        window.shareViaFacebook  = shareViaFacebook;
+        window.copyShareLink     = copyShareLink;
+        window.nativeShare       = nativeShare;
+    </script>
+
+    <!-- ══════════════════════ FIREBASE ══════════════════════ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, runTransaction, push, serverTimestamp, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -114,22 +405,91 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const adsterraSmartLinks = {
-            ultimate: "https://www.highrevenuegate.com/ultimate_goats_link",
-            pots: "https://www.highrevenuegate.com/pots_link",
-            new_era: "https://www.highrevenuegate.com/new_era_link",
-            attackers: "https://www.highrevenuegate.com/attackers_link",
-            midfield: "https://www.highrevenuegate.com/midfield_link",
-            defense: "https://www.highrevenuegate.com/defense_link",
-            goalkeeper: "https://www.highrevenuegate.com/goalkeeper_link",
-            coach: "https://www.highrevenuegate.com/coach_link"
+        let adsterraSmartLinks = {
+            ultimate: "https://www.effectivecpmnetwork.com/rwj2iaik6g?key=d39bd78c2ae2358792721a701a778ba9",
+            pots: "https://www.effectivecpmnetwork.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce",
+            new_era: "https://www.effectivecpmnetwork.com/bsq70i1eb?key=0bff075b211abb9b8f49876fd31f4583",
+            attackers: "https://www.effectivecpmnetwork.com/jz0wgq6t?key=f32ff86fd8ac2458f5609501ca4ce5a5",
+            midfield: "https://www.effectivecpmnetwork.com/tkqdck8hek?key=7525a6f99d11360ada80010d1d4a1259",
+            defense: "https://www.effectivecpmnetwork.com/gsp5czh1?key=8bd972d64b2d0b91f50bb9a523645582",
+            goalkeeper: "https://www.effectivecpmnetwork.com/h0vkpri11?key=7bfd6214f87a8cdeb3f2e8767d4b5378",
+            coach: "https://www.effectivecpmnetwork.com/z8u4ywdk?key=bbd8f4ee2f06396668fac6b6fd8309f1"
         };
+
+        onValue(ref(db, 'adsterraSmartLinks'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) adsterraSmartLinks = data;
+        });
 
         let currentCategory = 'ultimate';
         let countdownTickerInterval = null;
         let currentDbRef = null;
 
-        // --- SECTION 1: LEADERBOARD SYSTEM ---
+        window.switchCategory = function(categoryKey) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+            document.getElementById(`tab-${categoryKey}`).classList.add('active-tab');
+            bindCategoryRealtimeStream(categoryKey);
+        };
+
+        window.executeDatabaseVote = async function(playerId) {
+            const lastVote = localStorage.getItem(`cooldown_${currentCategory}`);
+            const now = new Date().getTime();
+            
+            if (lastVote && now < parseInt(lastVote)) return;
+
+            const targetAdUrl = adsterraSmartLinks[currentCategory] || adsterraSmartLinks['ultimate'];
+            window.open(targetAdUrl, '_blank');
+
+            const targetPlayersRef = ref(db, `categories/${currentCategory}/players`);
+
+            try {
+                await runTransaction(targetPlayersRef, (playersData) => {
+                    if (playersData) {
+                        const keys = Object.keys(playersData);
+                        for (let key of keys) {
+                            if (playersData[key] && playersData[key].id === playerId) {
+                                if (playersData[key].actualVotes === undefined) playersData[key].actualVotes = playersData[key].votes || 0;
+                                if (playersData[key].riggedVotes === undefined) playersData[key].riggedVotes = 0;
+
+                                playersData[key].actualVotes += 1;
+                                playersData[key].votes = playersData[key].actualVotes + playersData[key].riggedVotes;
+                                break;
+                            }
+                        }
+                    }
+                    return playersData;
+                });
+
+                const lockoutTime = now + (60 * 60 * 1000);
+                localStorage.setItem(`cooldown_${currentCategory}`, lockoutTime.toString());
+                checkAndApplyCooldown();
+
+            } catch (error) {
+                console.error("Vote handling sync failure:", error);
+            }
+        };
+
+        window.handleChatSubmit = async function(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById("chat-username").value.trim();
+            const messageInput = document.getElementById("chat-msg").value.trim();
+
+            if(!usernameInput || !messageInput) return;
+
+            localStorage.setItem("chat_username", usernameInput);
+
+            try {
+                await push(ref(db, 'messages'), {
+                    username: usernameInput,
+                    text: messageInput,
+                    timestamp: serverTimestamp()
+                });
+                document.getElementById("chat-msg").value = "";
+            } catch (err) {
+                console.error("Chat message streaming write failure:", err);
+            }
+        };
+
         function bindCategoryRealtimeStream(categoryKey) {
             currentCategory = categoryKey;
             currentDbRef = ref(db, 'categories/' + categoryKey);
@@ -169,7 +529,6 @@
                 }
 
                 const isLeader = index === 0;
-
                 const cardHTML = `
                     <div class="glass-card rounded-2xl p-4 flex flex-col items-center text-center relative overflow-hidden transition-all duration-300 ${isLeader ? 'border-amber-500/20 bg-amber-500/[0.005]' : 'hover:border-slate-800'}">
                         ${isLeader ? 
@@ -195,43 +554,6 @@
             lucide.createIcons();
             checkAndApplyCooldown();
         }
-
-        window.executeDatabaseVote = async function(playerId) {
-            const lastVote = localStorage.getItem(`cooldown_${currentCategory}`);
-            const now = new Date().getTime();
-            
-            if (lastVote && now < parseInt(lastVote)) return;
-
-            window.open(adsterraSmartLinks[currentCategory] || adsterraSmartLinks['ultimate'], '_blank');
-
-            const targetPlayersRef = ref(db, `categories/${currentCategory}/players`);
-
-            try {
-                await runTransaction(targetPlayersRef, (playersData) => {
-                    if (playersData) {
-                        const keys = Object.keys(playersData);
-                        for (let key of keys) {
-                            if (playersData[key] && playersData[key].id === playerId) {
-                                if (playersData[key].actualVotes === undefined) playersData[key].actualVotes = playersData[key].votes || 0;
-                                if (playersData[key].riggedVotes === undefined) playersData[key].riggedVotes = 0;
-
-                                playersData[key].actualVotes += 1;
-                                playersData[key].votes = playersData[key].actualVotes + playersData[key].riggedVotes;
-                                break;
-                            }
-                        }
-                    }
-                    return playersData;
-                });
-
-                const lockoutTime = now + (60 * 60 * 1000);
-                localStorage.setItem(`cooldown_${currentCategory}`, lockoutTime.toString());
-                checkAndApplyCooldown();
-
-            } catch (error) {
-                console.error("Vote handling error:", error);
-            }
-        };
 
         function initCategoryCountdown(endTimeString) {
             if (countdownTickerInterval) clearInterval(countdownTickerInterval);
@@ -279,30 +601,14 @@
                 btn.innerHTML = `<i data-lucide="lock" class="w-3 h-3 text-slate-600"></i> ${minutes}m ${seconds}s`;
             });
             lucide.createIcons();
-            
-            setTimeout(checkAndApplyCooldown, 1000);
         }
 
-        window.switchCategory = function(categoryKey) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
-            document.getElementById(`tab-${categoryKey}`).classList.add('active-tab');
-            bindCategoryRealtimeStream(categoryKey);
-        };
-
-
-        // --- SECTION 2: LIVE CHAT ROOM LOGIC ---
         const chatFeed = document.getElementById("chat-messages-feed");
-        const chatForm = document.getElementById("chat-input-form");
-
-        // Cache saved username to local storage for quick messaging
         if(localStorage.getItem("chat_username")) {
             document.getElementById("chat-username").value = localStorage.getItem("chat_username");
         }
 
-        // Query only the last 40 chat messages to prevent performance lag on mobile phones
-        const chatQuery = query(ref(db, 'messages'), limitToLast(40));
-
-        onValue(chatQuery, (snapshot) => {
+        onValue(query(ref(db, 'messages'), limitToLast(120)), (snapshot) => {
             chatFeed.innerHTML = "";
             const data = snapshot.val();
             if (!data) {
@@ -310,10 +616,9 @@
                 return;
             }
 
-            // Loop through messages naturally
             Object.values(data).forEach(msg => {
                 const msgBox = document.createElement("div");
-                msgBox.className = "bg-slate-950/40 border border-slate-900/60 rounded-xl p-2.5 max-w-[90%] w-fit animate-fade-in";
+                msgBox.className = "bg-slate-950/40 border border-slate-900/60 rounded-xl p-2.5 max-w-[90%] w-fit";
                 msgBox.innerHTML = `
                     <div class="flex items-center gap-1.5 mb-0.5">
                         <span class="font-black text-amber-500/90 text-[10px] tracking-wide">${escapeHtml(msg.username)}</span>
@@ -322,41 +627,25 @@
                 `;
                 chatFeed.appendChild(msgBox);
             });
-
-            // Auto-scroll layout smoothly straight to the newest text entry frame
             chatFeed.scrollTop = chatFeed.scrollHeight;
         });
 
-        window.handleChatSubmit = async function(event) {
-            event.preventDefault();
-            const usernameInput = document.getElementById("chat-username").value.trim();
-            const messageInput = document.getElementById("chat-msg").value.trim();
-
-            if(!usernameInput || !messageInput) return;
-
-            // Cache username handle
-            localStorage.setItem("chat_username", usernameInput);
-
-            try {
-                // Post object properties seamlessly to database tree node pointer
-                await push(ref(db, 'messages'), {
-                    username: usernameInput,
-                    text: messageInput,
-                    timestamp: serverTimestamp()
-                });
-                document.getElementById("chat-msg").value = "";
-            } catch (err) {
-                console.error("Chat message write failure:", err);
-            }
-        };
-
-        // Anti-XSS String Sanitizer security tool
         function escapeHtml(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        // Boot init
         bindCategoryRealtimeStream('ultimate');
+        setInterval(checkAndApplyCooldown, 1000);
     </script>
+        <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Syrix PWA Service Worker linked successfully:', reg.scope))
+                    .catch(err => console.error('PWA Service Worker registration failed:', err));
+            });
+        }
+    </script>
+    
 </body>
 </html>
